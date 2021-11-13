@@ -10,6 +10,8 @@ public class Group {
 
     public Group(String groupId) {
         id = groupId;
+        // replace this after contacting server
+        name = "default group name";
         // contact the server to get data
     }
 }
