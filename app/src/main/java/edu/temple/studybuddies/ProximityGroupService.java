@@ -97,7 +97,15 @@ public class ProximityGroupService extends Service {
         this.stopService();
     }
 
-    // END SECTION ***
+    // END SECTION CONTAINING PUBLIC METHODS ***
+
+
+    @Override
+    public void onDestroy() {
+        Nearby.getConnectionsClient(this).stopAdvertising();
+        Nearby.getConnectionsClient(this).stopDiscovery();
+        super.onDestroy();
+    }
 
     private void makeNotification() {
         makeChannel();
