@@ -12,6 +12,8 @@ import android.os.IBinder;
 
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
@@ -26,6 +28,8 @@ import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 
+import java.util.ArrayList;
+
 public class ProximityGroupService extends Service {
 
     static final String SERVICE_ID = "edu.temple.studybuddies.SERVICE_ID";
@@ -35,6 +39,10 @@ public class ProximityGroupService extends Service {
 
     private Notification notification;
     private String userId;
+    private String groupId;
+    private ArrayList<String> connections;
+    private ArrayList<Group> groupList;
+    private GroupAdapter groupAdapter;
 
     private final IBinder binder = new ProximityGroupBinder();
 
@@ -54,6 +62,8 @@ public class ProximityGroupService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        connections = new ArrayList<>();
+        groupList = new ArrayList<>();
         makeNotification();
         startForeground(ONGOING_NOTIFICATION_ID, notification);
         return START_NOT_STICKY;
@@ -65,18 +75,26 @@ public class ProximityGroupService extends Service {
         userId = uid;
     }
 
-    public void startAdvertising() throws Exception {
+    public void startAdvertising(String groupId) throws Exception {
         if(userId == null || userId.equals("")) {
             throw new Exception("Must first call setUserId in calling Activity");
         }
+        this.groupId = groupId;
         startAdvertisingLogic();
     }
 
-    public void startDiscovery() throws Exception {
+    public void startDiscovery(RecyclerView view) throws Exception {
         if(userId == null || userId.equals("")) {
             throw new Exception("Must first call setUserId in calling Activity");
         }
+        groupAdapter = new GroupAdapter(groupList);
+        view.setAdapter(groupAdapter);
+        view.setLayoutManager(new LinearLayoutManager(this));
         startDiscoveryLogic();
+    }
+
+    public void stopService() {
+        this.stopService();
     }
 
     // END SECTION ***
@@ -127,7 +145,13 @@ public class ProximityGroupService extends Service {
             Nearby.getConnectionsClient(getApplicationContext()).acceptConnection(endpointId, new PayloadCallback() {
                 @Override
                 public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
-                    // what to do with received data
+                    connections.add(endpointId);
+                    if(groupId == null || groupId.equals("")) {
+                        String data = new String(payload.asBytes());
+                        Group group = new Group(data);
+                        groupList.add(group);
+                        groupAdapter.notifyItemInserted(groupList.indexOf(group));
+                    }
                 }
 
                 @Override
@@ -139,12 +163,20 @@ public class ProximityGroupService extends Service {
 
         @Override
         public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution connectionResolution) {
-            // what to do when a connection is made (example: send data that identifies connection name to display to user)
+            if(groupId != null || !groupId.equals("")) {
+                Payload toSend = Payload.fromBytes(groupId.getBytes());
+                Nearby.getConnectionsClient(getApplicationContext()).sendPayload(endpointId, toSend);
+            }
         }
 
         @Override
         public void onDisconnected(@NonNull String endpointId) {
-            // what to do when the connection is lost
+            int pos = connections.indexOf(endpointId);
+            if(groupId == null || groupId.equals("")) {
+                groupList.remove(pos);
+                groupAdapter.notifyItemRemoved(pos);
+            }
+            connections.remove(pos);
         }
     };
 

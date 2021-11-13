@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> {
 
-    private ArrayList<String> localDataSet;
+    private ArrayList<Group> localDataSet;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
@@ -26,7 +26,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         }
     }
 
-    public GroupAdapter(ArrayList<String> dataSet) {
+    public GroupAdapter(ArrayList<Group> dataSet) {
         localDataSet = dataSet;
     }
 
@@ -40,7 +40,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(GroupAdapter.ViewHolder holder, int position) {
-        holder.getTextView().setText(localDataSet.get(position));
+        holder.getTextView().setText(localDataSet.get(position).name);
     }
 
     @Override

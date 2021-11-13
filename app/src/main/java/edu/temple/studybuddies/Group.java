@@ -3,13 +3,13 @@ package edu.temple.studybuddies;
 import java.util.LinkedList;
 
 public class Group {
-    String groupId;
+    String id;
     String name;
-    String ownerId;
+    String owner;
     LinkedList<String> meetings;
 
-    public Group(String id) {
-        groupId = id;
+    public Group(String groupId) {
+        id = groupId;
         // contact the server to get data
     }
 }
