@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "189445670592",
+    "project_id": "studybuddies-8a619",
+    "storage_bucket": "studybuddies-8a619.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189445670592:android:f05dff42116145ffc5cf25",
+        "android_client_info": {
+          "package_name": "edu.temple.studybuddies"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "189445670592-toiv8r1vbmh5f95od9rpicmokhvbdkrt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqe1SQIIoLMyjWZF3K-5F3VEln-KB1DO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "189445670592-toiv8r1vbmh5f95od9rpicmokhvbdkrt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
