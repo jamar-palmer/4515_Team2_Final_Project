@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,6 +60,20 @@ public class MeetingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_meeting, container, false);
+
+        View l =  inflater.inflate(R.layout.fragment_meeting, container, false);
+        Button joinGroup = l.findViewById(R.id.btnCreateMeet);
+        joinGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MeetingCreatorActivity) getActivity()).createMeeting();
+            }
+        });
+
+        return l;
+    }
+
+    interface MeetingFragmentInterface {
+        public void createMeeting();
     }
 }
