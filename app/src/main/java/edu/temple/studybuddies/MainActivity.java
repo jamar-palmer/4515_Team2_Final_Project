@@ -7,9 +7,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import us.zoom.sdk.JoinMeetingOptions;
+import us.zoom.sdk.JoinMeetingParams;
+import us.zoom.sdk.MeetingService;
+import us.zoom.sdk.ZoomSDK;
+import us.zoom.sdk.ZoomSDKInitParams;
+import us.zoom.sdk.ZoomSDKInitializeListener;
 
 
-public class MainActivity extends AppCompatActivity implements HomepageFragment.HomepageFragmentInterface {
+public class MainActivity extends AppCompatActivity implements HomepageFragment.HomepageFragmentInterface, APIControllerFragment.APIControllerFragmentInterface {
 
     FragmentManager fragmentManager;
 
@@ -38,6 +44,26 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
     @Override
     public void createMeeting() {
         Intent intent = new Intent(this, MeetingCreatorActivity.class);
+        intent.putExtra("fragment", 0);
+        startActivity(intent);
+    }
+
+    @Override
+    public void viewMeeting() {
+        Intent intent = new Intent(this, MeetingCreatorActivity.class);
+        intent.putExtra("fragment", 1);
+        startActivity(intent);
+    }
+
+    @Override
+    public void joinGroup() {
+        Intent intent = new Intent(this, GroupCreatorActivity.class);
+        startActivity(intent);
+    }
+
+    @Override
+    public void viewGroup() {
+        Intent intent = new Intent(this, GroupCreatorActivity.class);
         startActivity(intent);
     }
 }
