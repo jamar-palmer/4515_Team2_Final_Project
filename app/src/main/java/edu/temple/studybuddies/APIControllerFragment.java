@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -59,6 +60,34 @@ public class APIControllerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_a_p_i_controller, container, false);
+        View l = inflater.inflate(R.layout.fragment_a_p_i_controller, container, false);
+        Button meeting = l.findViewById(R.id.btnViewMeeting);
+        Button joinG = l.findViewById(R.id.btnJoinGroup);
+        Button viewG = l.findViewById(R.id.btnViewGroup);
+        meeting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).viewMeeting();
+            }
+        });
+        joinG.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).joinGroup();
+            }
+        });
+        viewG.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((MainActivity) getActivity()).viewGroup();
+            }
+        });
+        return l;
+    }
+
+    interface APIControllerFragmentInterface {
+        public void viewMeeting();
+        public void joinGroup();
+        public void viewGroup();
     }
 }
