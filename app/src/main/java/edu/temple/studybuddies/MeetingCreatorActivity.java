@@ -91,6 +91,7 @@ public class MeetingCreatorActivity extends AppCompatActivity implements Meeting
     }
     @Override
     public void joinGroup() {
+        //static for testing. feel free to change
         String meetingPw = "abc";
         String meetingName = "UserName 1";
         String meetingNum = "2814859285";
@@ -128,6 +129,7 @@ public class MeetingCreatorActivity extends AppCompatActivity implements Meeting
 
     @Override
     public void createMeeting() {
+        //static for testing. feel free to change
         login("jchunksy@yahoo.com", "Jchunks1");
     }
 }
