@@ -5,6 +5,13 @@ import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class LoginAndRegisterActivity extends AppCompatActivity  implements LoginFragment.LoginFragmentInterface, RegisterFragment.RegisterFragmentInterface {
     FragmentManager fragmentManager;
@@ -25,12 +32,62 @@ public class LoginAndRegisterActivity extends AppCompatActivity  implements Logi
 
     @Override
     public void login() {
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        EditText usernameEditText = findViewById(R.id.editUsername);
+        EditText passwordEditText = findViewById(R.id.editPassword);
+        Query foundUsersMatching = StudyBuddies.db.collection("users")
+                .whereEqualTo("username", usernameEditText.getText().toString())
+                .whereEqualTo("password", passwordEditText.getText().toString());
+        foundUsersMatching.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (queryDocumentSnapshots.size() > 0) {
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.putExtra("ACTIVE_USER_ID",
+                                    queryDocumentSnapshots.getDocuments().get(0).getId());
+                            startActivity(intent);
+                        } else {
+                            TextView errorText = findViewById(R.id.loginErrorText);
+                            errorText.setText(getString(R.string.login_error));
+                        }
+                    }
+                });
     }
 
     @Override
     public void register() {
-        fragmentManager.beginTransaction().replace(R.id.loginContainer, new LoginFragment()).addToBackStack(null).commit();
+        EditText usernameEditText = findViewById(R.id.registerUsernameEditText);
+        EditText passwordEditText = findViewById(R.id.registerPasswordEditText);
+        EditText passwordConfirmEditText = findViewById(R.id.registerPasswordConfirmEditText);
+        EditText firstNameEditText = findViewById(R.id.firstNameEditText);
+        EditText lastNameEditText = findViewById(R.id.lastNameEditText);
+        TextView errorTextView = findViewById(R.id.registerErrorTextView);
+        String password = passwordEditText.getText().toString();
+        String passwordConfirm = passwordConfirmEditText.getText().toString();
+        if (!password.equals(passwordConfirm)) {
+            errorTextView.setText(getString(R.string.register_password_error));
+            return;
+        }
+        Query foundUsersMatching = StudyBuddies.db.collection("users")
+                .whereEqualTo("username", usernameEditText.getText().toString());
+        foundUsersMatching.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if(queryDocumentSnapshots.size() > 0) {
+                        errorTextView.setText(getString(R.string.register_username_error));
+                        return;
+                    }
+                    try {
+                        User registeredUser = User.create(firstNameEditText.getText().toString(),
+                                lastNameEditText.getText().toString(),
+                                usernameEditText.getText().toString(),
+                                passwordEditText.getText().toString());
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.putExtra("ACTIVE_USER_ID", registeredUser.id);
+                        startActivity(intent);
+                    } catch (InterruptedException e) {
+                        Log.d("REGISTER", "You done fucked up.");
+                        return;
+                    }
+                });
     }
 }

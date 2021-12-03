@@ -22,4 +22,8 @@
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="notification_title">Proximity Group Service</string>
     <string name="notification_message">Nearby app communication enabled</string>
+
+    <string name="login_error">Could not find user with that username/password.</string>
+    <string name="register_password_error">Passwords must match.</string>
+    <string name="register_username_error">Username already exists.</string>
 </resources>
