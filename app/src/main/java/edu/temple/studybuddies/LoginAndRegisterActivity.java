@@ -13,6 +13,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginAndRegisterActivity extends AppCompatActivity  implements LoginFragment.LoginFragmentInterface, RegisterFragment.RegisterFragmentInterface {
     FragmentManager fragmentManager;
 
@@ -76,18 +79,17 @@ public class LoginAndRegisterActivity extends AppCompatActivity  implements Logi
                         errorTextView.setText(getString(R.string.register_username_error));
                         return;
                     }
-                    try {
-                        User registeredUser = User.create(firstNameEditText.getText().toString(),
-                                lastNameEditText.getText().toString(),
-                                usernameEditText.getText().toString(),
-                                passwordEditText.getText().toString());
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("ACTIVE_USER_ID", registeredUser.id);
-                        startActivity(intent);
-                    } catch (InterruptedException e) {
-                        Log.d("REGISTER", "You done fucked up.");
-                        return;
-                    }
+                    Map<String, Object> nUser = new HashMap<>();
+                    nUser.put("firstName", firstNameEditText.getText().toString());
+                    nUser.put("lastName", lastNameEditText.getText().toString());
+                    nUser.put("username", usernameEditText.getText().toString());
+                    nUser.put("password", passwordEditText.getText().toString());
+                    StudyBuddies.addDocument(nUser, StudyBuddies.CollectionType.USERS,
+                            ref -> {
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.putExtra("ACTIVE_USER_ID", ref.getId());
+                                startActivity(intent);
+                            });
                 });
     }
 }

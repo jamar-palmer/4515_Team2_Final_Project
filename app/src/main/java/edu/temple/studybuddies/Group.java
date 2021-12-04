@@ -55,44 +55,4 @@ public class Group {
         owner = docSnap.getString("owner");
         meetings = (List<String>) docSnap.get("meetings");
     }
-
-    // use this when you want to add a Group document to the database
-    // creates document in database and returns a Group object containing the data
-    public static Group create(String group, String owner) {
-        Map<String, Object> nGroup = new HashMap<>();
-        nGroup.put("name", group);
-        if (!owner.startsWith("users/")) {
-            owner = "users/" + owner;
-        }
-        nGroup.put("owner", owner);
-        DocumentReference ref = StudyBuddies.db.collection("groups").document();
-                ref.set(nGroup)
-                .addOnSuccessListener(unused -> {
-                    Log.d("Group", "Write successful");
-                })
-                .addOnFailureListener(e -> {
-                    Log.d("Group", "Write failed: " + e);
-                });
-        // remember, since we call the constructor
-        // the data is updated in the app when it changes on the database
-        // cuts down on code repetition but
-        // the downside is that we have to contact the database to write
-        // then here we read from it again, but I'm not sure there's really a better way
-        return new Group(ref.getId());
-    }
-
-    // create a new meeting on the database
-    // then use the returned meeting object
-    // to get the ID and add it to the List<> of meetings
-    // the Meeting object is garbage collected and we keep the String
-    public void addMeeting(Date startTime, Date endTime, Uri url) {
-        Meeting nMeeting = Meeting.create(startTime, endTime, url, this.id);
-        meetings.add(nMeeting.id);
-    }
-
-    // return a User object referencing the corresponding database document
-    // this is expensive, so use a reference to this.owner if you just need the ID
-    public User getOwner() {
-        return new User(this.owner);
-    }
 }
