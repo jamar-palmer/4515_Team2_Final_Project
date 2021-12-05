@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
 
             if (nearbyMode.equals(NEARBY_DISCOVERING)) {
                 try {
+                    Log.d("SERVICE", "Calling start discovery");
                     pgService.startDiscovery(findViewById(R.id.groupRecyclerView));
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -110,9 +111,9 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
                     .addToBackStack(null)
                     .commit();
             nearbyMode = NEARBY_DISCOVERING;
-            bindService(new Intent(this,
-                            ProximityGroupService.class),
-                    mConnection, Context.BIND_AUTO_CREATE);
+            Intent intent = new Intent(getApplicationContext(), ProximityGroupService.class);
+            startService(intent);
+            bindService(intent, mConnection, BIND_AUTO_CREATE);
         })
         .setPositiveButton(R.string.join, (dialog, which) -> {
             // TODO: join group via "out of band"

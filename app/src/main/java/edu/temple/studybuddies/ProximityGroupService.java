@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -67,6 +69,7 @@ public class ProximityGroupService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("SERVICE", "OnStartCommand called");
         connections = new ArrayList<>();
         groupList = new ArrayList<>();
         makeNotification();
@@ -101,7 +104,7 @@ public class ProximityGroupService extends Service {
     }
 
     public void stopService() {
-        this.stopService();
+        this.stopSelf();
     }
 
     // END SECTION CONTAINING PUBLIC METHODS ***
@@ -202,7 +205,7 @@ public class ProximityGroupService extends Service {
                 .startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
-
+                            Toast.makeText(this, "Now discovering", Toast.LENGTH_LONG).show();
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
