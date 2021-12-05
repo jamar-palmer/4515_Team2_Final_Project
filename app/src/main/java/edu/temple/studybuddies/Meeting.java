@@ -20,7 +20,6 @@ public class Meeting {
 
     // Constructor creates a new Meeting object
     // Meeting must exist in the database already
-    // otherwise use Meeting.create()
     public Meeting(String meetingId) {
         // remove path from ID
         if (meetingId.startsWith("meetings/")) {

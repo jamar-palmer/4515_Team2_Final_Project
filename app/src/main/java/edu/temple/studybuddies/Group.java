@@ -20,7 +20,6 @@ public class Group {
 
     // Constructor creates a new Group object
     // Group must exist in the database already
-    // otherwise use Group.create()
     public Group(String groupId) {
         //  remove path from ID
         if(groupId.startsWith("groups")) {

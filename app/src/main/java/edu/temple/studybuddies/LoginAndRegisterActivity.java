@@ -59,31 +59,40 @@ public class LoginAndRegisterActivity extends AppCompatActivity  implements Logi
 
     @Override
     public void register() {
+        // get references to user input EditTexts and error message TextView
         EditText usernameEditText = findViewById(R.id.registerUsernameEditText);
         EditText passwordEditText = findViewById(R.id.registerPasswordEditText);
         EditText passwordConfirmEditText = findViewById(R.id.registerPasswordConfirmEditText);
         EditText firstNameEditText = findViewById(R.id.firstNameEditText);
         EditText lastNameEditText = findViewById(R.id.lastNameEditText);
         TextView errorTextView = findViewById(R.id.registerErrorTextView);
+
+        // get strings from password fields and confirm the passwords match
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
         if (!password.equals(passwordConfirm)) {
             errorTextView.setText(getString(R.string.register_password_error));
             return;
         }
+
+        // create a query matching the username field
         Query foundUsersMatching = StudyBuddies.db.collection("users")
                 .whereEqualTo("username", usernameEditText.getText().toString());
         foundUsersMatching.get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                    // make sure the username does not already exist in the database
                     if(queryDocumentSnapshots.size() > 0) {
                         errorTextView.setText(getString(R.string.register_username_error));
                         return;
                     }
+                    // instantiate a Map to pass into the document creation function
+                    // using fields filled by the user in the EditTexts
                     Map<String, Object> nUser = new HashMap<>();
                     nUser.put("firstName", firstNameEditText.getText().toString());
                     nUser.put("lastName", lastNameEditText.getText().toString());
                     nUser.put("username", usernameEditText.getText().toString());
                     nUser.put("password", passwordEditText.getText().toString());
+                    // create the document in the "users" collection
                     StudyBuddies.addDocument(nUser, StudyBuddies.CollectionType.USERS,
                             ref -> {
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
