@@ -3,9 +3,10 @@ package edu.temple.studybuddies;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -15,12 +16,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity implements HomepageFragment.HomepageFragmentInterface, APIControllerFragment.ControllerInterface {
 
     static final String NEARBY_BROADCASTING = "broadcasting";
     static final String NEARBY_DISCOVERING = "discovering";
     static final String NEARBY_OFF = "off";
+
+    private RecyclerView recyclerView;
+    private ArrayList<Group> groupList;
+    private GroupAdapter groupAdapter;
 
     FragmentManager fragmentManager;
     User activeUser;
@@ -118,5 +125,23 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
         .setPositiveButton(R.string.join, (dialog, which) -> {
             // TODO: join group via "out of band"
         }).create().show();
+    }
+
+    @Override
+    public void viewGroups() {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.mainContainer, new GroupListFragment())
+                .addToBackStack(null)
+                .commit();
+        groupList = new ArrayList<>();
+        groupAdapter = new GroupAdapter(groupList);
+        recyclerView = findViewById(R.id.groupRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(groupAdapter);
+        for (String groupId : activeUser.groups) {
+            groupList.add(new Group(groupId, () ->
+                    groupAdapter.notifyItemInserted(groupList.size() - 1)));
+        }
     }
 }

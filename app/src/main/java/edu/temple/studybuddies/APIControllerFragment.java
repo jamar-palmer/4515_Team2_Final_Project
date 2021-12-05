@@ -61,14 +61,21 @@ public class APIControllerFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_a_p_i_controller, container, false);
+        ControllerInterface parentActivity = (ControllerInterface) getActivity();
         Button joinGroupButton = view.findViewById(R.id.btnJoinGroup);
         joinGroupButton.setOnClickListener(v -> {
-            ((ControllerInterface) getActivity()).launchJoinGroupDialogue();
+            parentActivity.launchJoinGroupDialogue();
         });
+        Button viewGroupsButton = view.findViewById(R.id.btnViewGroup);
+        viewGroupsButton.setOnClickListener(v -> {
+            parentActivity.viewGroups();
+        });
+
         return view;
     }
 
     public interface ControllerInterface {
         void launchJoinGroupDialogue();
+        void viewGroups();
     }
 }

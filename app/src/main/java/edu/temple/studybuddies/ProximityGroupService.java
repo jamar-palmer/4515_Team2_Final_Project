@@ -98,8 +98,8 @@ public class ProximityGroupService extends Service {
 
         groupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(groupList);
-        view.setAdapter(groupAdapter);
         view.setLayoutManager(new LinearLayoutManager(this));
+        view.setAdapter(groupAdapter);
         startDiscoveryLogic();
     }
 
