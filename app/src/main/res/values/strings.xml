@@ -26,4 +26,9 @@
     <string name="login_error">Could not find user with that username/password.</string>
     <string name="register_password_error">Passwords must match.</string>
     <string name="register_username_error">Username already exists.</string>
+    <string name="join_group_title">Join Group</string>
+    <string name="join_group_message">Enter a group name to join:</string>
+    <string name="cancel">Cancel</string>
+    <string name="nearby">Nearby</string>
+    <string name="join">Join</string>
 </resources>

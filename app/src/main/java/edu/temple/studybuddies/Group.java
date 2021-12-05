@@ -20,7 +20,7 @@ public class Group {
 
     // Constructor creates a new Group object
     // Group must exist in the database already
-    public Group(String groupId) {
+    public Group(String groupId, NewGroupCallback callback) {
         //  remove path from ID
         if(groupId.startsWith("groups")) {
             groupId = groupId.substring(meetings.lastIndexOf('/') + 1);
@@ -32,6 +32,7 @@ public class Group {
             if (task.isSuccessful()) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 fillData(documentSnapshot);
+                callback.onNewGroup();
             } else {
                 return;
             }
@@ -47,11 +48,19 @@ public class Group {
         });
     }
 
+    public Group(String groupId) {
+        this(groupId, () -> {});
+    }
+
     // helper method for constructor
     private void fillData(DocumentSnapshot docSnap) {
         id = docSnap.getId();
         name = docSnap.getString("name");
         owner = docSnap.getString("owner");
         meetings = (List<String>) docSnap.get("meetings");
+    }
+
+    public interface NewGroupCallback {
+        void onNewGroup();
     }
 }

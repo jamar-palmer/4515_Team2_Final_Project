@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.view.MotionEvent;
 
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,8 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -87,6 +90,23 @@ public class ProximityGroupService extends Service {
         if(userId == null || userId.equals("")) {
             throw new Exception("Must first call setUserId in calling Activity");
         }
+        view.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(@NonNull @NotNull RecyclerView rv, @NonNull @NotNull MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(@NonNull @NotNull RecyclerView rv, @NonNull @NotNull MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        groupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(groupList);
         view.setAdapter(groupAdapter);
         view.setLayoutManager(new LinearLayoutManager(this));
