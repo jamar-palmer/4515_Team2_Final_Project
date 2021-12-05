@@ -47,6 +47,8 @@ public class ProximityGroupService extends Service {
     private ArrayList<Group> groupList;
     private GroupAdapter groupAdapter;
 
+    public String selectedItem;
+
     private final IBinder binder = new ProximityGroupBinder();
 
     public class ProximityGroupBinder extends Binder {
@@ -90,22 +92,7 @@ public class ProximityGroupService extends Service {
         if(userId == null || userId.equals("")) {
             throw new Exception("Must first call setUserId in calling Activity");
         }
-        view.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull @NotNull RecyclerView rv, @NonNull @NotNull MotionEvent e) {
-                return false;
-            }
 
-            @Override
-            public void onTouchEvent(@NonNull @NotNull RecyclerView rv, @NonNull @NotNull MotionEvent e) {
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        });
         groupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(groupList);
         view.setAdapter(groupAdapter);
