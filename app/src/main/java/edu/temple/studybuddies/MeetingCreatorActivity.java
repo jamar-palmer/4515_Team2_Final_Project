@@ -69,7 +69,7 @@ public class MeetingCreatorActivity extends AppCompatActivity implements Meeting
         if(director == 0){
             fragmentManager.beginTransaction().replace(R.id.meetingContainer, new MeetingFragment()).commit();
         }else{
-            fragmentManager.beginTransaction().replace(R.id.meetingContainer, new MeetingDetailsFragment()).commit();
+            fragmentManager.beginTransaction().replace(R.id.meetingContainer, new MeetingFragment()).commit();
         }
 
         initializeZoom(this);
