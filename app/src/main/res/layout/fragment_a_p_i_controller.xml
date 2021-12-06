@@ -23,9 +23,9 @@
         android:layout_width="117dp"
         android:layout_height="68dp"
         android:layout_marginStart="16dp"
-        android:background="@drawable/halfround"
         android:layout_marginTop="8dp"
-        android:text="View Meeting"
+        android:background="@drawable/halfround"
+        android:text="View Meetings"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnHome" />
 

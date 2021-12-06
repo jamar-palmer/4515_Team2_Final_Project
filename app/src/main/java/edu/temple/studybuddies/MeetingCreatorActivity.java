@@ -1,12 +1,22 @@
 package edu.temple.studybuddies;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.util.Calendar;
 
 import us.zoom.sdk.JoinMeetingOptions;
 import us.zoom.sdk.JoinMeetingParams;
@@ -22,6 +32,13 @@ import us.zoom.sdk.ZoomSDKInitializeListener;
 public class MeetingCreatorActivity extends AppCompatActivity implements MeetingDetailsFragment.MeetingDetailsFragmentInterface, MeetingFragment.MeetingFragmentInterface {
 
     FragmentManager fragmentManager;
+    int meetingYear;
+    int meetingMonth;
+    int meetingDay;
+    Integer startTimeHour = null;
+    Integer startTimeMinute = null;
+    Integer endTimeHour = null;
+    Integer endTimeMinute = null;
     private ZoomSDKAuthenticationListener authListener = new ZoomSDKAuthenticationListener() {
         /**
          * This callback is invoked when a result from the SDK's request to the auth server is
@@ -132,4 +149,104 @@ public class MeetingCreatorActivity extends AppCompatActivity implements Meeting
         //static for testing. feel free to change
         login("jchunksy@yahoo.com", "Jchunks1");
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void selectDate() {
+        Calendar selectedDate = Calendar.getInstance();
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this);
+        datePickerDialog.setOnDateSetListener(new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                meetingYear = year;
+                meetingMonth = month;
+                meetingDay = dayOfMonth;
+                selectedDate.clear();
+                selectedDate.set(year, month, dayOfMonth);
+                ((TextView) findViewById(R.id.meetingDateTextView))
+                        .setText(DateFormat.getDateInstance(DateFormat.FULL).format(selectedDate.getTime()));
+            }
+        });
+        Calendar now = Calendar.getInstance();
+        datePickerDialog.getDatePicker().setMinDate(now.getTimeInMillis());
+        now.add(Calendar.WEEK_OF_YEAR, 2);
+        datePickerDialog.getDatePicker().setMaxDate(now.getTimeInMillis());
+        datePickerDialog.getDatePicker().updateDate(meetingYear, meetingMonth, meetingDay);
+
+        datePickerDialog.show();
+    }
+
+    public void selectStartTime() {
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                if (endTimeHour != null && endTimeMinute != null) {
+                    if ((hourOfDay * 60 + minute) > (endTimeHour * 60 + endTimeMinute)) {
+                        String hour = endTimeHour > 12 ? String.valueOf(endTimeHour - 12) : String.valueOf(endTimeHour);
+                        String minutes = (endTimeMinute < 10)? endTimeMinute + "0" : String.valueOf(endTimeMinute);
+                        String AMPM = (endTimeHour < 12) ? "AM" : "PM";
+                        Toast.makeText(MeetingCreatorActivity.this,
+                                "Meeting cannot start after " + hour + ": " + minutes + " " + AMPM, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                int displayHour = (hourOfDay > 12) ? hourOfDay - 12 : hourOfDay;
+                String displayMinute = (minute < 10) ? (minute) + "0" : String.valueOf(minute);
+                String AMPM = hourOfDay < 12 ? "AM" : "PM";
+                String displayTime = (displayHour + ": " + displayMinute + " " + AMPM);
+                startTimeHour = hourOfDay;
+                startTimeMinute = minute;
+                ((TextView) findViewById(R.id.meetingStartTimeTextView))
+                        .setText(displayTime);
+                if (endTimeHour == null && endTimeMinute == null) {
+                    endTimeHour = startTimeHour + 1;
+                    endTimeMinute = startTimeMinute;
+
+                    displayHour = (endTimeHour < 12) ? endTimeHour : endTimeHour - 12;
+                    AMPM = (endTimeHour < 12) ? "AM" : "PM";
+                    displayTime = displayHour + ": " + displayMinute + " " + AMPM;
+                    ((TextView) findViewById(R.id.meetingEndTimeTextView))
+                            .setText(displayTime);
+                }
+            }
+        }, startTimeHour != null ? startTimeHour : 12, startTimeMinute != null ? startTimeMinute : 0, false);
+        timePickerDialog.show();
+    }
+
+    public void selectEndTime() {
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                if (startTimeHour != null && startTimeMinute != null) {
+                    if ((hourOfDay * 60 + minute) < (startTimeHour * 60 + startTimeMinute)) {
+                        String hour = startTimeHour > 12 ? String.valueOf(startTimeHour - 12) : String.valueOf(startTimeHour);
+                        String minutes = (startTimeMinute < 10)? startTimeMinute + "0" : String.valueOf(startTimeMinute);
+                        String AMPM = (startTimeHour < 12) ? "AM" : "PM";
+                        Toast.makeText(MeetingCreatorActivity.this,
+                                "Meeting cannot end before " + hour + ": " + minutes + " " + AMPM, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+                int displayHour = (hourOfDay > 12) ? hourOfDay - 12 : hourOfDay;
+                String displayMinute = (minute < 10) ? (minute) + "0" : String.valueOf(minute);
+                String AMPM = hourOfDay < 12 ? "AM" : "PM";
+                String displayTime = (displayHour + ": " + displayMinute + " " + AMPM);
+                endTimeHour = hourOfDay;
+                endTimeMinute = minute;
+                ((TextView) findViewById(R.id.meetingEndTimeTextView))
+                        .setText(displayTime);
+                if (startTimeHour == null && endTimeMinute == null) {
+                    startTimeHour = endTimeHour - 1 == 0 ? 24 : endTimeHour - 1;
+                    startTimeMinute = endTimeMinute;
+
+                    displayHour = (startTimeHour < 12) ? startTimeHour : startTimeHour - 12;
+                    AMPM = (startTimeHour < 12) ? "AM" : "PM";
+                    displayTime = displayHour + ": " + minute + " " + AMPM;
+                    ((TextView) findViewById(R.id.meetingStartTimeTextView))
+                            .setText(displayTime);
+                }
+            }
+        }, endTimeHour != null ? endTimeHour : 12, endTimeMinute != null ? endTimeMinute : 0, false);
+        timePickerDialog.show();
+    }
+
 }

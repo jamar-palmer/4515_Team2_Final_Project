@@ -1,13 +1,17 @@
 package edu.temple.studybuddies;
 
+import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,11 +66,36 @@ public class MeetingFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View l =  inflater.inflate(R.layout.fragment_meeting, container, false);
-        Button joinGroup = l.findViewById(R.id.btnCreateMeet);
-        joinGroup.setOnClickListener(new View.OnClickListener() {
+        Button createMeeting = l.findViewById(R.id.btnCreateMeet);
+        createMeeting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ((MeetingCreatorActivity) getActivity()).createMeeting();
+            }
+        });
+
+        Button selectDate = l.findViewById(R.id.meetingDatePickerButton);
+        selectDate.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onClick(View v) {
+                ((MeetingCreatorActivity) getActivity()).selectDate();
+            }
+        });
+
+        Button startTime = l.findViewById(R.id.meetingStartTimeButton);
+        startTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MeetingCreatorActivity) getActivity()).selectStartTime();
+            }
+        });
+
+        Button endTime = l.findViewById(R.id.meetingEndTimeButton);
+        endTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MeetingCreatorActivity) getActivity()).selectEndTime();
             }
         });
 
