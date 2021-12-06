@@ -49,7 +49,7 @@ public class User {
         if (userId.startsWith("users/")) {
             userId = userId.substring(userId.lastIndexOf('/') + 1);
         }
-
+        setListeners(userId, callback);
     }
 
     public void setListeners(String userId, NewUserCallback callback) {

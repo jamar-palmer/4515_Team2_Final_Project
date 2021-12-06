@@ -70,6 +70,10 @@ public class APIControllerFragment extends Fragment {
         viewGroupsButton.setOnClickListener(v -> {
             parentActivity.viewGroups();
         });
+        Button homeButton = view.findViewById(R.id.btnHome);
+        homeButton.setOnClickListener(v -> {
+            parentActivity.home();
+        });
 
         return view;
     }
@@ -77,5 +81,6 @@ public class APIControllerFragment extends Fragment {
     public interface ControllerInterface {
         void launchJoinGroupDialogue();
         void viewGroups();
+        void home();
     }
 }

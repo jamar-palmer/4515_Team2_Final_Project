@@ -211,6 +211,14 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
         activeUser.addGroup(groupId, callback);
     }
 
+    @Override
+    public void home() {
+        fragmentManager
+                .beginTransaction()
+                .replace(R.id.mainContainer, new HomepageFragment())
+                .commit();
+    }
+
     private boolean checkAllPermissions() {
         return ContextCompat.checkSelfPermission(this, "ALL_PERMISSIONS") == PackageManager.PERMISSION_GRANTED;
     }
