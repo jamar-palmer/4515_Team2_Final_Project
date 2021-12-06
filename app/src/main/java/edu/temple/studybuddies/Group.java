@@ -18,13 +18,32 @@ public class Group {
     protected String owner;
     protected List<String> meetings;
 
-    // Constructor creates a new Group object
-    // Group must exist in the database already
+
+    /** Constructor creates an empty group
+     *  Must be initialized with a call to {@code setListeners}
+     *
+     */
+    public Group() {
+
+    }
+    /** Constructor creates a new Group object
+     * Group must exist in the database already
+     */
+    public Group(String groupId) {
+        this(groupId, () -> {});
+    }
+    /** Constructor creates a new Group object with a callback
+     * Group must exist in the database already
+     */
     public Group(String groupId, NewGroupCallback callback) {
         //  remove path from ID
         if(groupId.startsWith("groups")) {
-            groupId = groupId.substring(meetings.lastIndexOf('/') + 1);
+            groupId = groupId.substring(groupId.lastIndexOf('/') + 1);
         }
+        setListeners(groupId, callback);
+    }
+
+    public void setListeners(String groupId, NewGroupCallback callback) {
         // get the reference to the database document
         doc = StudyBuddies.db.collection("groups").document(groupId);
         // get the snapshot and fill data
@@ -46,10 +65,6 @@ public class Group {
                 fillData(value);
             }
         });
-    }
-
-    public Group(String groupId) {
-        this(groupId, () -> {});
     }
 
     // helper method for constructor

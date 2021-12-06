@@ -33,21 +33,21 @@
         android:id="@+id/btnJoinGroup"
         android:layout_width="117dp"
         android:layout_height="68dp"
-        android:layout_marginStart="144dp"
-        android:background="@drawable/halfround"
         android:layout_marginTop="8dp"
+        android:background="@drawable/halfround"
         android:text="Join Groups"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnViewGroup"
+        app:layout_constraintStart_toEndOf="@+id/btnViewMeeting"
         app:layout_constraintTop_toBottomOf="@+id/btnHome" />
 
     <Button
         android:id="@+id/btnViewGroup"
         android:layout_width="117dp"
         android:layout_height="68dp"
-        android:layout_marginStart="276dp"
-        android:background="@drawable/halfround"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/halfround"
         android:text="View Groups"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnHome" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,13 +18,30 @@ public class Meeting {
     protected Uri url;
     protected String group;
 
-    // Constructor creates a new Meeting object
-    // Meeting must exist in the database already
+    /** Constructor creates an empty {@code Meeting}
+     *  Must be initialized with a call to {@code setListeners}
+     */
+    public Meeting() {
+
+    }
+    /** Constructor creates a new {@code Meeting} object
+     * Group must exist in the database already
+     */
     public Meeting(String meetingId) {
+        this(meetingId, () -> {});
+    }
+    /** Constructor creates a new {@code Meeting} object with a callback
+     * Meeting must exist in the database already
+     */
+    public Meeting(String meetingId, NewMeetingCallback callback) {
         // remove path from ID
         if (meetingId.startsWith("meetings/")) {
             meetingId = meetingId.substring(meetingId.lastIndexOf('/') + 1);
         }
+        setListeners(meetingId, callback);
+    }
+
+    public void setListeners(String meetingId, NewMeetingCallback callback) {
         // get the reference to the database document
         doc = StudyBuddies.db.collection("meetings").document(meetingId);
         // get the snapshot and fill data
@@ -32,6 +49,7 @@ public class Meeting {
             if (task.isSuccessful()) {
                 DocumentSnapshot documentSnapshot = task.getResult();
                 fillData(documentSnapshot);
+                callback.onNewMeeting();
             } else {
                 return;
             }
@@ -62,4 +80,7 @@ public class Meeting {
         return new Group(this.group);
     }
 
+    public interface NewMeetingCallback {
+        void onNewMeeting();
+    }
 }

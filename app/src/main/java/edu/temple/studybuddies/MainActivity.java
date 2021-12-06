@@ -1,7 +1,10 @@
 package edu.temple.studybuddies;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,19 +12,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
+import android.Manifest;
 
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements HomepageFragment.HomepageFragmentInterface, APIControllerFragment.ControllerInterface {
+public class MainActivity extends AppCompatActivity implements HomepageFragment.HomepageFragmentInterface, APIControllerFragment.ControllerInterface, GroupDetailsFragment.GroupDetailsInterface {
 
-    static final String NEARBY_BROADCASTING = "broadcasting";
+    static final String NEARBY_ADVERTISING = "broadcasting";
     static final String NEARBY_DISCOVERING = "discovering";
     static final String NEARBY_OFF = "off";
 
@@ -30,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
     private GroupAdapter groupAdapter;
 
     FragmentManager fragmentManager;
-    User activeUser;
+    public User activeUser;
     boolean bound;
     String nearbyMode;
     ProximityGroupService pgService;
@@ -47,7 +52,17 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
                     Log.d("SERVICE", "Calling start discovery");
                     pgService.startDiscovery(findViewById(R.id.groupRecyclerView));
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+            }
+            if (nearbyMode.equals(NEARBY_ADVERTISING)) {
+                GroupDetailsFragment currentGroupFragment =
+                        (GroupDetailsFragment) fragmentManager
+                                .findFragmentByTag("currentGroupFragment");
+                try {
+                    pgService.startAdvertising(currentGroupFragment.getGroupId());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -57,6 +72,20 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
 
         }
     };
+
+    private ActivityResultLauncher<String[]> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+                    isGranted -> {
+                        boolean allGranted = true;
+                        for (String k : isGranted.keySet()) {
+                            if(allGranted && !isGranted.get(k)) {
+                                allGranted = false;
+                            }
+                        }
+                        if(allGranted){
+                            // maybe do something here
+                        }
+                    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +141,9 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
             // nothing
         })
         .setNeutralButton(R.string.nearby, (dialog, which) -> {
+            if (!checkAllPermissions()) {
+                getUserPermission();
+            }
             fragmentManager
                     .beginTransaction()
                     .replace(R.id.mainContainer, new GroupListFragment())
@@ -129,19 +161,67 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
 
     @Override
     public void viewGroups() {
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.mainContainer, new GroupListFragment())
-                .addToBackStack(null)
-                .commit();
-        groupList = new ArrayList<>();
-        groupAdapter = new GroupAdapter(groupList);
-        recyclerView = findViewById(R.id.groupRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(groupAdapter);
-        for (String groupId : activeUser.groups) {
-            groupList.add(new Group(groupId, () ->
-                    groupAdapter.notifyItemInserted(groupList.size() - 1)));
+        if (activeUser.groups != null && activeUser.groups.size() > 0) {
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.mainContainer, new GroupListFragment())
+                    .addToBackStack(null)
+                    .commit();
+            fragmentManager.executePendingTransactions();
+            groupList = new ArrayList<>();
+            groupAdapter = new GroupAdapter(groupList);
+            recyclerView = findViewById(R.id.groupRecyclerView);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+            recyclerView.setAdapter(groupAdapter);
+            for (String groupId : activeUser.groups) {
+                groupList.add(new Group(groupId, () -> {
+                    groupAdapter.notifyDataSetChanged();
+                }));
+                groupAdapter.notifyItemInserted(groupList.size() - 1);
+            }
+        } else {
+            Toast.makeText(this, "You are not currently in a group", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public User getActiveUser() {
+        return activeUser;
+    }
+
+    @Override
+    public void broadcastGroup() {
+        if (!checkAllPermissions()) {
+            getUserPermission();
+        }
+        nearbyMode = NEARBY_ADVERTISING;
+        Intent intent = new Intent(getApplicationContext(), ProximityGroupService.class);
+        startService(intent);
+        bindService(intent, mConnection, BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void leaveGroup(String groupId, User.RemoveGroupCallback callback) {
+        activeUser.removeGroup(groupId, callback);
+    }
+
+    @Override
+    public void joinGroup(String groupId, User.AddGroupCallback callback) {
+        activeUser.addGroup(groupId, callback);
+    }
+
+    private boolean checkAllPermissions() {
+        return ContextCompat.checkSelfPermission(this, "ALL_PERMISSIONS") == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void getUserPermission() {
+        requestPermissionLauncher.launch(new String[] {
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.CHANGE_WIFI_STATE,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+        });
     }
 }

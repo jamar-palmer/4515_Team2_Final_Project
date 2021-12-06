@@ -1,6 +1,7 @@
 package edu.temple.studybuddies;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,16 +25,19 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
             super(view);
             textView = view.findViewById(R.id.row_text);
             view.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putString(GroupDetailsFragment.GROUP_ID, id);
-                GroupDetailsFragment groupDetailsFragment = GroupDetailsFragment.newInstance();
-                groupDetailsFragment.setArguments(bundle);
-                AppCompatActivity activity = (AppCompatActivity) view.getContext();
-                activity.getSupportFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.mainContainer, groupDetailsFragment)
-                        .addToBackStack(null)
-                        .commit();
+                if (id != null) {
+                    Log.d("ADAPTER", "ID should not be null: " + id);
+                    Bundle bundle = new Bundle();
+                    bundle.putString(GroupDetailsFragment.GROUP_ID, id);
+                    GroupDetailsFragment groupDetailsFragment = GroupDetailsFragment.newInstance();
+                    groupDetailsFragment.setArguments(bundle);
+                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                    activity.getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.mainContainer, groupDetailsFragment, "currentGroupFragment")
+                            .addToBackStack(null)
+                            .commit();
+                }
             });
         }
 
@@ -58,6 +62,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     public void onBindViewHolder(GroupAdapter.ViewHolder holder, int position) {
         holder.getTextView().setText(localDataSet.get(position).name);
         holder.id = localDataSet.get(position).id;
+        Log.d("ADAPTER", "GroupId in Group Adapter: " + holder.id);
     }
 
     @Override
