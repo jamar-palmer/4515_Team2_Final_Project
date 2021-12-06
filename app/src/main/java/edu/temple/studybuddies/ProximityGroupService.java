@@ -9,6 +9,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
@@ -28,6 +31,8 @@ import com.google.android.gms.nearby.connection.PayloadCallback;
 import com.google.android.gms.nearby.connection.PayloadTransferUpdate;
 import com.google.android.gms.nearby.connection.Strategy;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class ProximityGroupService extends Service {
@@ -43,6 +48,8 @@ public class ProximityGroupService extends Service {
     private ArrayList<String> connections;
     private ArrayList<Group> groupList;
     private GroupAdapter groupAdapter;
+
+    public String selectedItem;
 
     private final IBinder binder = new ProximityGroupBinder();
 
@@ -62,6 +69,7 @@ public class ProximityGroupService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("SERVICE", "OnStartCommand called");
         connections = new ArrayList<>();
         groupList = new ArrayList<>();
         makeNotification();
@@ -80,6 +88,7 @@ public class ProximityGroupService extends Service {
             throw new Exception("Must first call setUserId in calling Activity");
         }
         this.groupId = groupId;
+        Log.d("NEARBY", "StartAdvertising called, groupId=" + groupId);
         startAdvertisingLogic();
     }
 
@@ -87,14 +96,21 @@ public class ProximityGroupService extends Service {
         if(userId == null || userId.equals("")) {
             throw new Exception("Must first call setUserId in calling Activity");
         }
+        Log.d("NEARBY", "StartDiscovery called, groupId=" + groupId);
+        groupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(groupList);
         view.setAdapter(groupAdapter);
         view.setLayoutManager(new LinearLayoutManager(this));
         startDiscoveryLogic();
     }
 
+    public void stopNearby() {
+        Nearby.getConnectionsClient(this).stopAdvertising();
+        Nearby.getConnectionsClient(this).stopDiscovery();
+    }
+
     public void stopService() {
-        this.stopService();
+        this.stopSelf();
     }
 
     // END SECTION CONTAINING PUBLIC METHODS ***
@@ -102,8 +118,7 @@ public class ProximityGroupService extends Service {
 
     @Override
     public void onDestroy() {
-        Nearby.getConnectionsClient(this).stopAdvertising();
-        Nearby.getConnectionsClient(this).stopDiscovery();
+        stopNearby();
         super.onDestroy();
     }
 
@@ -140,6 +155,7 @@ public class ProximityGroupService extends Service {
                         userId, SERVICE_ID, connectionLifecycleCallback, advertisingOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
+                            Toast.makeText(this, "Now advertising", Toast.LENGTH_LONG).show();
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
@@ -154,9 +170,13 @@ public class ProximityGroupService extends Service {
                 @Override
                 public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
                     connections.add(endpointId);
-                    if(groupId == null || groupId.equals("")) {
+                    Log.d("NEARBY", "Group ID: " + groupId);
+                    if(groupId == null) {
                         String data = new String(payload.asBytes());
-                        Group group = new Group(data);
+                        Group group = new Group(data, () -> {
+                            groupAdapter.notifyDataSetChanged();
+                            Log.d("NEARBY", "Should be seeing group list");
+                        });
                         groupList.add(group);
                         groupAdapter.notifyItemInserted(groupList.indexOf(group));
                     }
@@ -171,7 +191,8 @@ public class ProximityGroupService extends Service {
 
         @Override
         public void onConnectionResult(@NonNull String endpointId, @NonNull ConnectionResolution connectionResolution) {
-            if(groupId != null || !groupId.equals("")) {
+            Log.d("NEARBY","In onConnectionResult, groupId=" + groupId);
+            if(groupId != null) {
                 Payload toSend = Payload.fromBytes(groupId.getBytes());
                 Nearby.getConnectionsClient(getApplicationContext()).sendPayload(endpointId, toSend);
             }
@@ -195,11 +216,11 @@ public class ProximityGroupService extends Service {
                 .startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions)
                 .addOnSuccessListener(
                         (Void unused) -> {
-
+                            Toast.makeText(this, "Now discovering", Toast.LENGTH_LONG).show();
                         })
                 .addOnFailureListener(
                         (Exception e) -> {
-
+                            e.printStackTrace();
                         });
     }
 

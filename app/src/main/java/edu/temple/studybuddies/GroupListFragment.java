@@ -7,14 +7,13 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link APIControllerFragment#newInstance} factory method to
+ * Use the {@link GroupListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class APIControllerFragment extends Fragment {
+public class GroupListFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +24,7 @@ public class APIControllerFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public APIControllerFragment() {
+    public GroupListFragment() {
         // Required empty public constructor
     }
 
@@ -35,11 +34,11 @@ public class APIControllerFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment APIControllerFragment.
+     * @return A new instance of fragment GroupListFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static APIControllerFragment newInstance(String param1, String param2) {
-        APIControllerFragment fragment = new APIControllerFragment();
+    public static GroupListFragment newInstance(String param1, String param2) {
+        GroupListFragment fragment = new GroupListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -60,27 +59,6 @@ public class APIControllerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_a_p_i_controller, container, false);
-        ControllerInterface parentActivity = (ControllerInterface) getActivity();
-        Button joinGroupButton = view.findViewById(R.id.btnJoinGroup);
-        joinGroupButton.setOnClickListener(v -> {
-            parentActivity.launchJoinGroupDialogue();
-        });
-        Button viewGroupsButton = view.findViewById(R.id.btnViewGroup);
-        viewGroupsButton.setOnClickListener(v -> {
-            parentActivity.viewGroups();
-        });
-        Button homeButton = view.findViewById(R.id.btnHome);
-        homeButton.setOnClickListener(v -> {
-            parentActivity.home();
-        });
-
-        return view;
-    }
-
-    public interface ControllerInterface {
-        void launchJoinGroupDialogue();
-        void viewGroups();
-        void home();
+        return inflater.inflate(R.layout.fragment_group_list, container, false);
     }
 }
