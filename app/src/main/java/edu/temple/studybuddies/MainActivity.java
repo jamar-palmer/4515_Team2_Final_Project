@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
             groupList = new ArrayList<>();
             groupAdapter = new GroupAdapter(groupList);
             recyclerView = findViewById(R.id.groupRecyclerView);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setAdapter(groupAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             for (String groupId : activeUser.groups) {
                 groupList.add(new Group(groupId, () -> {
                     groupAdapter.notifyDataSetChanged();

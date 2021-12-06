@@ -99,8 +99,8 @@ public class ProximityGroupService extends Service {
         Log.d("NEARBY", "StartDiscovery called, groupId=" + groupId);
         groupList = new ArrayList<>();
         groupAdapter = new GroupAdapter(groupList);
-        view.setLayoutManager(new LinearLayoutManager(this));
         view.setAdapter(groupAdapter);
+        view.setLayoutManager(new LinearLayoutManager(this));
         startDiscoveryLogic();
     }
 
