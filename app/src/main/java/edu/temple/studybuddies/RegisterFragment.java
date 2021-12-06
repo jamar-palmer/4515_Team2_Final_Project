@@ -81,5 +81,6 @@ public class RegisterFragment extends Fragment {
 
     interface RegisterFragmentInterface {
         public void register();
+        
     }
 }
