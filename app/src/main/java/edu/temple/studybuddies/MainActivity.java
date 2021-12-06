@@ -106,9 +106,10 @@ public class MainActivity extends AppCompatActivity implements HomepageFragment.
 
     @Override
     protected void onStop() {
-        if (bound)
+        if (bound) {
             pgService.stopService();
             unbindService(mConnection);
+        }
         super.onStop();
     }
 
